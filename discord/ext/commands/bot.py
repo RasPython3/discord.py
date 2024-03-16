@@ -1389,7 +1389,7 @@ class BotBase(GroupMixin[None]):
 
         ctx = await self.get_context(message)
         # the type of the invocation context's bot attribute will be correct
-        await self.invoke(ctx)  # type: ignore
+        return await self.invoke(ctx)  # type: ignore
 
     async def on_message(self, message: Message, /) -> None:
         await self.process_commands(message)
