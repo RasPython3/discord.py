@@ -1026,7 +1026,7 @@ class Command(_BaseCommand, Generic[CogT, P, T]):
         ctx.invoked_subcommand = None
         ctx.subcommand_passed = None
         injected = hooked_wrapped_callback(self, ctx, self.callback)  # type: ignore
-        await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+        return await injected(*ctx.args, **ctx.kwargs)  # type: ignore ###
 
     async def reinvoke(self, ctx: Context[BotT], /, *, call_hooks: bool = False) -> None:
         ctx.command = self
@@ -1641,18 +1641,20 @@ class Group(GroupMixin[CogT], Command[CogT, P, T]):
 
         if early_invoke:
             injected = hooked_wrapped_callback(self, ctx, self.callback)  # type: ignore
-            await injected(*ctx.args, **ctx.kwargs)  # type: ignore
+            result = await injected(*ctx.args, **ctx.kwargs)  # type: ignore ###
+            if result:
+                return result
 
         ctx.invoked_parents.append(ctx.invoked_with)  # type: ignore
 
         if trigger and ctx.invoked_subcommand:
             ctx.invoked_with = trigger
-            await ctx.invoked_subcommand.invoke(ctx)
+            return await ctx.invoked_subcommand.invoke(ctx) ###
         elif not early_invoke:
             # undo the trigger parsing
             view.index = previous
             view.previous = previous
-            await super().invoke(ctx)
+            return await super().invoke(ctx) ###
 
     async def reinvoke(self, ctx: Context[BotT], /, *, call_hooks: bool = False) -> None:
         ctx.invoked_subcommand = None
